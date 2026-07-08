@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
+import JWT from 'jsonwebtoken';
 import User from '../models/userModel.js';
+import { hashPassword, comparePassword, generateToken } from '../helpers/authHelper.js';
 
 export const registerUser = async (req, res) => {
     try {
         const { username, email, password, avatar, bio } = req.body;
 
-        // Validate input
         if (!username || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -13,7 +14,6 @@ export const registerUser = async (req, res) => {
             });
         }
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
@@ -23,16 +23,23 @@ export const registerUser = async (req, res) => {
             });
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hashPassword(password);
 
-        // Create user
         const user = await User.create({
             username,
             email,
             password: hashedPassword,
             avatar,
             bio,
+        });
+
+        const token = generateToken(user._id);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
         });
 
         return res.status(201).json({
@@ -51,6 +58,69 @@ export const registerUser = async (req, res) => {
         });
     } catch (error) {
         console.error('Register User Error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.',
+        });
+    }
+};
+
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required.',
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password.',
+            });
+        }
+
+        const isMatch = await comparePassword(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password.',
+            });
+        }
+
+        const token = generateToken(user._id);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+        });
+
+        user.isOnline = true;
+        user.lastSeen = new Date();
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Login successful.',
+            data: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                avatar: user.avatar,
+                bio: user.bio,
+            },
+        });
+    } catch (error) {
+        console.error('Login Error:', error);
 
         return res.status(500).json({
             success: false,
