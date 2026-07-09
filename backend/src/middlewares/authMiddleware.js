@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-const protect = (req, res, next) => {
+export const protect = (req, res, next) => {
     const token = req.cookies.token;
+    console.log(token);
 
     if (!token) {
         return res.status(401).json({
@@ -23,5 +24,3 @@ const protect = (req, res, next) => {
         });
     }
 };
-
-export default protect;
