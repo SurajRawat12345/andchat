@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import JWT from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/userModel.js';
 import { hashPassword, comparePassword, generateToken } from '../helpers/authHelper.js';
 
@@ -144,3 +145,109 @@ export const logoutUser = async (req, res) => {
         });
     }
 }
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required.',
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+
+        // Hash token before saving to DB
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+
+        // Save hashed token and expiry
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+
+        await user.save();
+
+        // Frontend reset URL
+        // const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+        // TODO:
+        // Send this URL to the user's email using Nodemailer/Brevo.
+        // console.log('Reset URL:', resetUrl);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password reset link has been generated.',
+            resetToken, // Remove this in production after email integration
+        });
+    } catch (error) {
+        console.error('Forgot Password Error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.',
+        });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password is required.',
+            });
+        }
+
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired reset token.',
+            });
+        }
+
+        user.password = await hashPassword(password);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password reset successfully.',
+        });
+    } catch (error) {
+        console.error('Reset Password Error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.',
+        });
+    }
+};
