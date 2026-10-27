@@ -251,3 +251,108 @@ export const resetPassword = async (req, res) => {
         });
     }
 };
+
+// Get current logged-in user
+export const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'User profile fetched successfully.',
+            data: user,
+        });
+    } catch (error) {
+        console.error('Get Current User Error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.',
+        });
+    }
+};
+
+// Update current user's profile
+export const updateProfile = async (req, res) => {
+    try {
+        const { username, bio, avatar } = req.body;
+
+        const updates = {};
+
+        if (username !== undefined) {
+            if (typeof username !== 'string' || !username.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username cannot be empty.',
+                });
+            }
+
+            updates.username = username.trim();
+        }
+
+        if (bio !== undefined) {
+            if (typeof bio !== 'string') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Bio must be a string.',
+                });
+            }
+
+            updates.bio = bio.trim();
+        }
+
+        if (avatar !== undefined) {
+            if (typeof avatar !== 'string') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Avatar must be a string.',
+                });
+            }
+
+            updates.avatar = avatar.trim();
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Provide at least one field to update.',
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: updates },
+            {
+                new: true,
+                runValidators: true,
+            }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully.',
+            data: user,
+        });
+    } catch (error) {
+        console.error('Update Profile Error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.',
+        });
+    }
+};
