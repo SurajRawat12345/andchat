@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/database.js';
 import userRoutes from './routes/userRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/chat', chatRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
