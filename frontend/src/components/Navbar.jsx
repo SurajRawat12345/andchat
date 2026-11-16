@@ -20,15 +20,15 @@ const Navbar = () => {
     return (
         <nav className="sticky top-0 z-50 w-full border-b-2 border-(--color-gray)/30 bg-(--color-background) text-(--color-text) transition-colors duration-300">
 
-            <div className="max-w-7xl h-20 mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div className="max-w-7xl h-16 md:h-20 mx-auto px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-between">
 
                 {/* Company Logo & Name */}
                 <Link
                     to="/"
-                    className="flex items-center gap-3 no-underline text-(--color-text)"
+                    className="flex items-center gap-1.5 sm:gap-3 no-underline text-(--color-text)"
                 >
-                    <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-(--color-blue) text-white text-xl shadow-sm">
-                        <FontAwesomeIcon icon={faMessage} />
+                    <div className="w-8 h-8 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl bg-(--color-blue) text-white text-xl shadow-sm">
+                        <FontAwesomeIcon icon={faMessage} className='text-sm sm:text-xl' />
                     </div>
 
                     <span className="text-xl sm:text-2xl font-bold tracking-tight">
@@ -77,16 +77,16 @@ const Navbar = () => {
                     {/* Login */}
                     <Link
                         to="/login"
-                        className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 border-(--color-gray)/50 text-(--color-text) text-sm font-semibold hover:bg-(--color-gray) transition-all duration-200"
+                        className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border-2 border-(--color-gray)/50 text-(--color-text) text-sm font-semibold hover:bg-(--color-gray) transition-all duration-200"
                     >
                         <FontAwesomeIcon icon={faRightToBracket} />
-                        Login
+                        <span className="hidden sm:inline">Login</span>
                     </Link>
 
                     {/* Sign Up */}
                     <Link
                         to="/signup"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--color-blue) text-white text-sm border-2 border-(--color-blue)/30 font-semibold hover:bg-(--color-dark-blue) hover:border-(--color-dark-blue) shadow-sm transition-all duration-200"
+                        className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--color-blue) text-white text-sm border-2 border-(--color-blue)/30 font-semibold hover:bg-(--color-dark-blue) hover:border-(--color-dark-blue) shadow-sm transition-all duration-200"
                     >
                         <FontAwesomeIcon icon={faUserPlus} />
                         Sign Up

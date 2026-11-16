@@ -12,8 +12,8 @@ import {
 
 const Landing = () => {
     return (
-        <section className="max-h-[calc(100vh-64px)] md:max-h-[calc(100vh-80px)] flex items-center bg-(--color-background) transition-colors duration-300">
-            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-0 pb-4">
+        <section className="h-auto min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-80px)] flex items-center bg-(--color-background) transition-colors duration-300">
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm-pt-8 md:pt-0 pb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
 
                     {/* Left: Text Content */}
