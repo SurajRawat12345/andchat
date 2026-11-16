@@ -15,6 +15,8 @@
     --color-dark-blue: #1b5dd6;
     --color-gray: #cfcfc4;
     --color-dark-gray: #595959;
+    --color-footer-text: #cfcfc4;
+    --color-footer-background: #272932;
 }
 
 
@@ -78,13 +80,13 @@ button:disabled {
 }
 
 a {
-    color: var(--color-text-link);
-    text-decoration: none;
+    /* color: var(--color-text-link);
+    text-decoration: none; */
     transition: color var(--transition-fast);
 }
 
 a:hover {
-    color: var(--color-text-link-hover);
+    /* color: var(--color-text-link-hover); */
 }
 
 img,
