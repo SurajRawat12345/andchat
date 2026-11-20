@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import useCurrentUser from '../hooks/useCurrentUser.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faArrowRight,
@@ -11,6 +12,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const Landing = () => {
+    const { currentUser, isLoggedIn, isLoading } = useCurrentUser();
+
     return (
         <section className="h-auto min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-80px)] flex items-center bg-(--color-background) transition-colors duration-300">
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm-pt-8 md:pt-0 pb-4 mt-0 md:-mt-8">
@@ -59,27 +62,45 @@ const Landing = () => {
                             </div>
                         </div>
 
-                        {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-10">
-                            <Link
-                                to="/signup"
-                                className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl bg-(--color-blue) hover:bg-(--color-dark-blue) text-white border-2 border-(--color-blue)/30 hover:border-(--color-dark-blue) font-semibold transition-all duration-300 shadow-lg shadow-blue-500/20"
-                            >
-                                Get Started
-                                <FontAwesomeIcon icon={faRocket} />
-                            </Link>
+                        {/* Authentication Actions */}
+                        {isLoading ? (
+                            <div className="w-20 h-10" />
+                            ) : isLoggedIn ? (
+                                <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-10">
+                                    <Link
+                                        to="/chats"
+                                        className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-(--color-blue) hover:bg-(--color-dark-blue) text-white border-2 border-(--color-blue)/30 hover:border-(--color-dark-blue) font-semibold transition-all duration-300 shadow-lg shadow-blue-500/20"
+                                    >
+                                        Go to Chats
+                                        <FontAwesomeIcon
+                                            icon={faArrowRight}
+                                            className="pt-1.25 transform-gpu transition-transform duration-500 ease-in-out group-hover:translate-x-1"
+                                        />
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-10">
+                                    <Link
+                                        to="/signup"
+                                        className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl bg-(--color-blue) hover:bg-(--color-dark-blue) text-white border-2 border-(--color-blue)/30 hover:border-(--color-dark-blue) font-semibold transition-all duration-300 shadow-lg shadow-blue-500/20"
+                                    >
+                                        Get Started
+                                        <FontAwesomeIcon icon={faRocket} />
+                                    </Link>
 
-                            <Link
-                                to="/login"
-                                className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border-2 border-(--color-gray)/50 text-(--color-text) hover:bg-(--color-gray) font-semibold transition-all duration-300"
-                            >
-                                Login
-                                <FontAwesomeIcon
-                                    icon={faArrowRight}
-                                    className="pt-1.25 transform-gpu transition-transform duration-500 ease-in-out group-hover:translate-x-1"
-                                />
-                            </Link>
-                        </div>
+                                    <Link
+                                        to="/login"
+                                        className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border-2 border-(--color-gray)/50 text-(--color-text) hover:bg-(--color-gray) font-semibold transition-all duration-300"
+                                    >
+                                        Login
+                                        <FontAwesomeIcon
+                                            icon={faArrowRight}
+                                            className="pt-1.25 transform-gpu transition-transform duration-500 ease-in-out group-hover:translate-x-1"
+                                        />
+                                    </Link>
+                                </div>
+                            )
+                        }
                     </div>
 
                     {/* Right: Image */}

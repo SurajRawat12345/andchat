@@ -1,17 +1,23 @@
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 import {
     useLoginMutation,
-    useGetCurrentUserQuery,
 } from '../features/auth/authApi.js';
+
+import useCurrentUser from '../hooks/useCurrentUser.jsx';
 
 function Login() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [demoMessage, setDemoMessage] = useState('');
+
+    const {
+        currentUser,
+        isLoading: isCheckingAuth,
+    } = useCurrentUser();
 
     const [
         login,
@@ -21,41 +27,44 @@ function Login() {
         },
     ] = useLoginMutation();
 
-    const {
-        data,
-        isLoading: isCheckingAuth,
-        isError: isAuthError,
-        refetch,
-    } = useGetCurrentUserQuery();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setDemoMessage('');
-
+    // Common login function
+    const handleLogin = async (loginEmail, loginPassword) => {
         try {
             await login({
-                email,
-                password,
+                email: loginEmail,
+                password: loginPassword,
             }).unwrap();
-
-            await refetch();
 
             setEmail('');
             setPassword('');
+
             console.log('Login successful');
-            navigate('/hello');
+            navigate('/chats');
+
         } catch (error) {
             console.log('Login failed:', error);
         }
     };
 
-    // Connect this to your backend's HR demo login when available.
-    const handleHrDemo = () => {
-        setDemoMessage(
-            'HR demo access is not configured yet. Please connect your demo login API.'
-        );
+    // Normal Login
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        await handleLogin(email, password);
     };
 
+    // HR Demo Login
+    const handleHrDemo = async () => {
+        const demoEmail = 'testuser@gmail.com';
+        const demoPassword = '12345678';
+
+        setEmail(demoEmail);
+        setPassword(demoPassword);
+
+        await handleLogin(demoEmail, demoPassword);
+    };
+
+    // Checking Authentication
     if (isCheckingAuth) {
         return (
             <div className="min-h-[calc(100svh-80px)] flex items-center justify-center bg-(--color-background)">
@@ -66,25 +75,26 @@ function Login() {
         );
     }
 
-    const user = data?.data;
-
-    if (user && !isAuthError) {
+    // Already Logged In
+    if (currentUser) {
         return (
             <div className="min-h-[calc(100svh-80px)] flex flex-col items-center justify-center bg-(--color-background) px-4">
+
                 <h1 className="text-2xl sm:text-3xl font-bold text-(--color-text)">
-                    Welcome, {user.username}!
+                    Welcome, {currentUser.username}!
                 </h1>
 
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/chats')}
                     className="mt-6 px-6 py-3 rounded-xl bg-(--color-blue) hover:bg-(--color-dark-blue) text-white font-semibold transition-colors duration-300"
                 >
-                    Go to Home
+                    Go to Chats
                 </button>
+
             </div>
         );
     }
-    
+
     return (
         <section
             className="h-screen max-h-screen min-h-[calc(100vh-80px)] w-full flex items-center justify-center overflow-y-auto px-4 py-4 bg-cover bg-center bg-no-repeat"
@@ -188,16 +198,13 @@ function Login() {
                         <button
                             type="button"
                             onClick={handleHrDemo}
-                            className="w-full py-3.5 rounded-2xl border border-white/40 text-white text-sm sm:text-base font-semibold hover:bg-white/10 transition-all duration-300"
+                            disabled={isLoggingIn}
+                            className="w-full py-3.5 rounded-2xl border border-white/40 text-white text-sm sm:text-base font-semibold hover:bg-white/10 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            HR Demo
+                            {isLoggingIn ? 'Please wait...' : 'HR Demo'}
                         </button>
+
                     </div>
-                    {demoMessage && (
-                        <p className="mt-3 text-xs text-center text-white/70">
-                            {demoMessage}
-                        </p>
-                    )}
                 </form>
 
                 {/* Signup */}
@@ -214,7 +221,6 @@ function Login() {
             </div>
         </section>
     );
-
 }
 
 export default Login;

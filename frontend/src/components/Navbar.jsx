@@ -1,19 +1,22 @@
-
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import {
+    faMessage,
     faSun,
     faMoon,
     faRightToBracket,
     faUserPlus,
-    faMessage
+    faUser,
+    faComments,
 } from '@fortawesome/free-solid-svg-icons';
 
-import useTheme from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme.jsx';
+import useCurrentUser from '../hooks/useCurrentUser.jsx';
 
-const Navbar = () => {
+function Navbar() {
     const { theme, toggleTheme } = useTheme();
+    const { currentUser, isLoggedIn, isLoading } = useCurrentUser();
 
     const isDark = theme === 'dark';
 
@@ -28,7 +31,10 @@ const Navbar = () => {
                     className="flex items-center gap-1.5 sm:gap-3 no-underline text-(--color-text)"
                 >
                     <div className="w-8 h-8 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl bg-(--color-blue) text-white text-xl shadow-sm">
-                        <FontAwesomeIcon icon={faMessage} className='text-sm sm:text-xl' />
+                        <FontAwesomeIcon
+                            icon={faMessage}
+                            className="text-sm sm:text-xl"
+                        />
                     </div>
 
                     <span className="text-xl sm:text-2xl font-bold tracking-tight">
@@ -68,34 +74,59 @@ const Navbar = () => {
                             <FontAwesomeIcon
                                 icon={isDark ? faMoon : faSun}
                                 className={`text-xs ${
-                                    isDark ? 'text-(--color-blue)' : 'text-amber-500'
+                                    isDark
+                                        ? 'text-(--color-blue)'
+                                        : 'text-amber-500'
                                 }`}
                             />
                         </span>
                     </button>
 
-                    {/* Login */}
-                    <Link
-                        to="/login"
-                        className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border-2 border-(--color-gray)/50 text-(--color-text) text-sm font-semibold hover:bg-(--color-gray) transition-all duration-200"
-                    >
-                        <FontAwesomeIcon icon={faRightToBracket} />
-                        <span className="hidden sm:inline">Login</span>
-                    </Link>
+                    {/* Authentication Actions */}
+                    {isLoading ? (
+                        <div className="w-20 h-10" />
+                    ) : isLoggedIn ? (
+                        <div className="flex items-center gap-2 sm:gap-4">
 
-                    {/* Sign Up */}
-                    <Link
-                        to="/signup"
-                        className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--color-blue) text-white text-sm border-2 border-(--color-blue)/30 font-semibold hover:bg-(--color-dark-blue) hover:border-(--color-dark-blue) shadow-sm transition-all duration-200"
-                    >
-                        <FontAwesomeIcon icon={faUserPlus} />
-                        Sign Up
-                    </Link>
+                            {/* Profile Button */}
+                            <Link
+                                to="/profile"
+                                title="Profile"
+                                aria-label="Profile"
+                                className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-(--color-gray)/50 text-(--color-text) hover:bg-(--color-gray)/20 transition-all duration-200"
+                            >
+                                <FontAwesomeIcon icon={faUser} />
+                            </Link>
+
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 sm:gap-4">
+
+                            {/* Login */}
+                            <Link
+                                to="/login"
+                                className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border-2 border-(--color-gray)/50 text-(--color-text) text-sm font-semibold hover:bg-(--color-gray) transition-all duration-200"
+                            >
+                                <FontAwesomeIcon icon={faRightToBracket} />
+                                <span className="hidden sm:inline">Login</span>
+                            </Link>
+
+                            {/* Sign Up */}
+                            <Link
+                                to="/signup"
+                                className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--color-blue) text-white text-sm border-2 border-(--color-blue)/30 font-semibold hover:bg-(--color-dark-blue) hover:border-(--color-dark-blue) shadow-sm transition-all duration-200"
+                            >
+                                <FontAwesomeIcon icon={faUserPlus} />
+                                Sign Up
+                            </Link>
+
+                        </div>
+                    )}
 
                 </div>
             </div>
         </nav>
     );
-};
+}
 
 export default Navbar;
