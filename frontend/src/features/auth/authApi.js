@@ -8,10 +8,12 @@ export const authApi = api.injectEndpoints({
                 method: 'POST',
                 body: credentials,
             }),
+            invalidatesTags: ['User'],
         }),
 
         getCurrentUser: builder.query({
             query: () => '/api/v1/user/me',
+            providesTags: ['User'],
         }),
 
         register: builder.mutation({
@@ -20,6 +22,7 @@ export const authApi = api.injectEndpoints({
                 method: 'POST',
                 body: userData,
             }),
+            invalidatesTags: ['User'],
         }),
 
         logout: builder.mutation({
@@ -27,6 +30,7 @@ export const authApi = api.injectEndpoints({
                 url: '/api/users/logout',
                 method: 'POST',
             }),
+            invalidatesTags: ['User'],
         }),
     }),
 });
