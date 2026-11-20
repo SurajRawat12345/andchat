@@ -5,7 +5,7 @@ import Login from './pages/Login';
 // import Register from './pages/Register';
 import Home from './pages/Home';
 // import Chat from './pages/Chat';
-import Hello from './pages/Hello';
+import ChatDashboard from './pages/ChatDashboard';
 import Register from './pages/Register';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
 
                 <Route path="/login" element={<Login />} />
 
-                <Route path="/hello" element={<Hello />} />
+                <Route path="/chats" element={<ChatDashboard />} />
 
                 <Route path="/signup" element={<Register />} />
 

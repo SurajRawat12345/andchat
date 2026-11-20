@@ -35,7 +35,7 @@ function Register() {
             setEmail('');
             setPassword('');
 
-            navigate('/hello');
+            navigate('/chats');
         } catch (error) {
             console.log('Registration failed:', error);
         }
